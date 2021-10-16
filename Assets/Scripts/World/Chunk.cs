@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -252,27 +253,32 @@ public class Chunk
 [System.Serializable]
 public class ChunkCoord
 {
+    public readonly World world;
     public readonly int x;
     public readonly int z;
 
-    public ChunkCoord(int _x, int _z)
+    public ChunkCoord(World world, int x, int z)
     {
-        x = _x;
-        z = _z;
+        this.world = world;
+        this.x = x;
+        this.z = z;
     }
 
     public override int GetHashCode()
     {
-        int hash = 2;
-        hash = hash * 23 + x.GetHashCode();
-        return hash * 23 + z.GetHashCode();
+        int hash = 3;
+        hash = 19 * hash + (world != null ? world.GetHashCode() : 0);
+
+        hash = 19 * hash + x | x << 6;
+        hash = 19 * hash + z | z << 6;
+        return hash;
     }
 
     public override bool Equals(object obj)
     {
-        if (obj is null) return false;
-        
-        return obj.GetHashCode() == GetHashCode();
+        if (obj is null || !(obj is ChunkCoord)) return false;
+        ChunkCoord o = (ChunkCoord) obj;
+        return o == this;
     }
 
     public override string ToString()
@@ -283,8 +289,8 @@ public class ChunkCoord
     public static bool operator ==(ChunkCoord c1, ChunkCoord c2)
     {
         if (c1 is null || c2 is null) return c1 is null && c2 is null;
-        
-        return c1.GetHashCode() == c2.GetHashCode();
+
+        return c1.x == c2.x && c1.z == c2.z && c1.world == c2.world;
     }
 
     public static bool operator !=(ChunkCoord c1, ChunkCoord c2)

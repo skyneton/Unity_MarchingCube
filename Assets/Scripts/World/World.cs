@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,18 +37,17 @@ public class World : MonoBehaviour
     void Start()
     {
         seed = new System.Random().Next(-RandomSeedRange, RandomSeedRange);
-        seed = -10981;
         IsActive = true;
         worlds.Add(this);
         spawnPosition = new Vector3(.5f, Mathf.FloorToInt((biome.terrainHeight - biome.minTerrainHeight) * GetNoise(0, 0) + biome.minTerrainHeight) + 1.5f, .5f);
         // new Chunk(new ChunkCoord(-40, -9), this).BuildMesh();
-        ChunkLoad(new ChunkCoord(0, 0));
+        ChunkLoad(new ChunkCoord(this, 0, 0));
         
         chunkLoadThread = new Thread(ChunkLoadWorker);
         chunkLoadThread.Start();
         
         player.transform.position = player.lastPosition = spawnPosition;
-        player.PlayerChunkCoord = new ChunkCoord(0, 0);
+        player.PlayerChunkCoord = new ChunkCoord(this, 0, 0);
     }
 
     private void Update()
@@ -77,7 +75,6 @@ public class World : MonoBehaviour
             }
             
             chunks.Add(chunk.coord, chunk);
-            chunk.BuildMesh();
             
             if (Mathf.Abs(chunk.coord.x - player.PlayerChunkCoord.x) > viewDistance ||
                 Mathf.Abs(chunk.coord.z - player.PlayerChunkCoord.z) > viewDistance)
@@ -85,6 +82,7 @@ public class World : MonoBehaviour
 
             else
             {
+                chunk.BuildMesh();
                 activeChunks.Add(chunk);
             }
         }
@@ -151,9 +149,9 @@ public class World : MonoBehaviour
         for (int x = pos.x - viewDistance; x <= pos.x + viewDistance; x++)
         for (int z = pos.z - viewDistance; z <= pos.z + viewDistance; z++)
         {
-            ChunkCoord coord = new ChunkCoord(x, z);
-            
-            if(chunks.ContainsKey(coord))
+            ChunkCoord coord = new ChunkCoord(this, x, z);
+
+            if (chunks.ContainsKey(coord))
                 ChunkSpawn(chunks[coord]);
             else
             {
@@ -198,7 +196,7 @@ public class World : MonoBehaviour
 
     public ChunkCoord GetChunkPosition(float x, float z)
     {
-        return new ChunkCoord(Mathf.FloorToInt(x / Chunk.ChunkWidth), Mathf.FloorToInt(z / Chunk.ChunkWidth));
+        return new ChunkCoord(this, Mathf.FloorToInt(x / Chunk.ChunkWidth), Mathf.FloorToInt(z / Chunk.ChunkWidth));
     }
 
     public static Vector3 WorldPos2ChunkPos(Vector3 pos)

@@ -43,7 +43,7 @@ public class Player : MonoBehaviour
     {
         CheckChunkLoaded();
         
-        text.text = PlayerChunkCoord.ToString();
+        text.text = transform.position.ToString();
         
         if(!IsMobile) CursorCheck();
         if (!IsMobile && !CursorManager.IsCursorLock) return;

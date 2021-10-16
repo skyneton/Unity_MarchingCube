@@ -394,12 +394,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   world: {fileID: 1197566980}
-  MouseSensitivity: 4.5
-  PitchLimit: 90
-  WalkSpeed: 4.5
-  JumpPower: 5.5
-  IsGround: 0
-  collider: {fileID: 725146247}
+  mouseSensitivity: 4.5
+  pitchLimit: 90
+  walkSpeed: 4.5
+  jumpPower: 6
+  collid: {fileID: 725146247}
   rigid: {fileID: 725146251}
   text: {fileID: 1775466106}
 --- !u!54 &725146251
