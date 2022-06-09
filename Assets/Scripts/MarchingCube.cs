@@ -33,8 +33,8 @@ public class MarchingCube : MonoBehaviour
         List<int> triangles,
         List<Vector2> uvs, float terrainSurface)
     {
-        if (blockType == BlockType.AIR) return;
-        Vector3Int posInt = new Vector3Int((int) pos.x, (int) pos.y, (int) pos.z);
+        if (blockType == BlockType.Air) return;
+        var posInt = Vector3Int.FloorToInt(pos);
         
         int configIndex = GetCubeConfigurationWall(posInt, voxelData, terrainSurface);
         if (configIndex == 0 || configIndex == 255) return;
@@ -86,33 +86,33 @@ public class MarchingCube : MonoBehaviour
     private static void MarchCube(Vector3Int pos, float[,,] voxelData, BlockType[,,] blockTypes, BlockType blockType,
         List<Vector3> vertices, List<int> triangles, List<Vector2> uvs, float terrainSurface)
     {
-        if (blockType == BlockType.AIR) return;
+        if (blockType == BlockType.Air) return;
         
         AddMeshData(GetCubeConfiguration(pos, voxelData, terrainSurface), pos, voxelData, blockType, vertices, triangles, uvs);
         
         // Side Mesh Add
-        if (pos.x > 0 && blockTypes[pos.x - 1, pos.y, pos.z] == BlockType.AIR)
+        if (pos.x > 0 && blockTypes[pos.x - 1, pos.y, pos.z] == BlockType.Air)
         {
             pos.x -= 1;
             AddMeshData(GetCubeConfiguration(pos, voxelData, terrainSurface), pos, voxelData, blockType, vertices, triangles, uvs);
             pos.x += 1;
         }
         
-        if (pos.y > 0 && blockTypes[pos.x, pos.y - 1, pos.z] == BlockType.AIR)
+        if (pos.y > 0 && blockTypes[pos.x, pos.y - 1, pos.z] == BlockType.Air)
         {
             pos.y -= 1;
             AddMeshData(GetCubeConfiguration(pos, voxelData, terrainSurface), pos, voxelData, blockType, vertices, triangles, uvs);
             pos.y += 1;
         }
         
-        if (pos.z > 0 && blockTypes[pos.x, pos.y, pos.z - 1] == BlockType.AIR)
+        if (pos.z > 0 && blockTypes[pos.x, pos.y, pos.z - 1] == BlockType.Air)
         {
             pos.z -= 1;
             AddMeshData(GetCubeConfiguration(pos, voxelData, terrainSurface), pos, voxelData, blockType, vertices, triangles, uvs);
             pos.z += 1;
         }
         
-        if (pos.x > 0 && pos.z > 0 && blockTypes[pos.x - 1, pos.y, pos.z - 1] == BlockType.AIR)
+        if (pos.x > 0 && pos.z > 0 && blockTypes[pos.x - 1, pos.y, pos.z - 1] == BlockType.Air)
         {
             pos.x -= 1;
             pos.z -= 1;
@@ -121,7 +121,7 @@ public class MarchingCube : MonoBehaviour
             pos.z += 1;
         }
         
-        if (pos.x > 0 && pos.z > 0 && blockTypes[pos.x - 1, pos.y, pos.z - 1] == BlockType.AIR)
+        if (pos.x > 0 && pos.z > 0 && blockTypes[pos.x - 1, pos.y, pos.z - 1] == BlockType.Air)
         {
             pos.x -= 1;
             pos.z -= 1;

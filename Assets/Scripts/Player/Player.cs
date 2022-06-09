@@ -4,6 +4,8 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Rigidbody))]
 public class Player : MonoBehaviour
 {
+    public static Player Instance { get; private set; }
+    public Vector3 lookPos;
     public ChunkCoord PlayerChunkCoord;
     public World world;
 
@@ -29,6 +31,11 @@ public class Player : MonoBehaviour
     public static bool IsMobile
     {
         get => Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer;
+    }
+
+    private void Awake()
+    {
+        Instance = this;
     }
 
     private void Start()
@@ -63,7 +70,7 @@ public class Player : MonoBehaviour
 
     private void IsGroundCheck()
     {
-        IsGround = Physics.Raycast(transform.position, Vector3.down, collid.bounds.extents.y + .35f) && Mathf.Abs(rigid.velocity.y) < 1.5f;
+        IsGround = rigid.velocity.y == 0 || Physics.Raycast(transform.position, Vector3.down, collid.bounds.extents.y + .35f) && Mathf.Abs(rigid.velocity.y) < 1.5f;
     }
 
     private void CursorCheck()
@@ -141,5 +148,40 @@ public class Player : MonoBehaviour
         }
 
         lastPosition = transform.position;
+    }
+
+    public Block GetLookBlock(int distance = 5)
+    {
+        var rot = transform.rotation;
+        rot.x = Camera.main.transform.rotation.x;
+        var forward = (rot * Vector3.forward).normalized;
+        var pos = transform.position + lookPos;
+        for (int i = 0; i < distance; i++)
+        {
+            pos += forward;
+            var blockPos = Vector3Int.RoundToInt(pos);
+            var block = world.GetBlock(blockPos);
+            if (block != BlockType.Air) continue;
+            return block;
+        }
+        return new Block(BlockType.Air, Vector3Int.RoundToInt(pos));
+    }
+
+    public Block GetLookCanBreakBlock(int distance = 5)
+    {
+        var rot = transform.rotation;
+        rot.x = Camera.main.transform.rotation.x;
+        //var forward = (rot * Vector3.forward).normalized;
+        var forward = Camera.main.transform.forward;
+        var pos = transform.position + lookPos;
+        for (int i = 0; i < distance; i++)
+        {
+            pos += forward;
+            var blockPos = Vector3Int.RoundToInt(pos);
+            var block = world.GetBlock(blockPos);
+            if (block.Strength < 0) continue;
+            return block;
+        }
+        return new Block(BlockType.Air, Vector3Int.RoundToInt(pos));
     }
 }

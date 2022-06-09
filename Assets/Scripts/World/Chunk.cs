@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class Chunk
@@ -16,7 +17,7 @@ public class Chunk
     private List<int> triangles = new List<int>();
     private List<Vector2> uvs = new List<Vector2>();
 
-    public const int ChunkWidth = 16, ChunkHeight = 300;
+    public const int ChunkWidth = 16, ChunkHeight = 255;
     
     internal BlockType[,,] blockData = new BlockType[ChunkWidth, ChunkHeight, ChunkWidth];
     
@@ -32,11 +33,11 @@ public class Chunk
         set { chunkObject?.SetActive(value); }
     }
 
-    public Chunk(ChunkCoord _coord, World _world)
+    public Chunk(ChunkCoord _coord, World _world, Action<Chunk> loaded = null)
     {
         coord = _coord;
         world = _world;
-        
+
         PopulateVoxelMap();
         GenerateMeshData();
     }
@@ -47,11 +48,11 @@ public class Chunk
             for (int y = 0; y < ChunkHeight; y++)
                 for (int z = 0; z < ChunkWidth; z++)
                 {
-                    blockData[x, y, z] = world.GetBlock(x + Position.x, y, z + Position.z);
+                    blockData[x, y, z] = world.GetBlock(x + Position.x, y, z + Position.z).Type;
                 }
     }
 
-    private void GenerateMeshData()
+    internal void GenerateMeshData()
     {
         ClearMeshData();
         for (int x = 0; x < ChunkWidth; x++)
@@ -107,7 +108,7 @@ public class Chunk
 
     private void MarchCube(Vector3Int pos, BlockType blockType)
     {
-        if (blockType == BlockType.AIR) return;
+        if (blockType == BlockType.Air) return;
 
         int configIndex = GetCubeConfiguration(pos);
         AddMeshData(configIndex, pos, blockType);
@@ -127,7 +128,7 @@ public class Chunk
                 // if(pos.x + x < 0) continue;
                 if(pos.y + y < 0) continue;
                 // if(pos.z + z < 0) continue;
-                if(world.GetBlock(ChunkPos2WorldPos(pos.x + x, pos.y + y, pos.z + z)) != BlockType.AIR) continue;
+                if(world.GetBlock(ChunkPos2WorldPos(pos.x + x, pos.y + y, pos.z + z)) != BlockType.Air) continue;
         
                 pos.x += x;
                 pos.y += y;
@@ -148,7 +149,7 @@ public class Chunk
 
     private void MarchCubeFloor(Vector3Int pos, BlockType blockType)
     {
-        if (blockType == BlockType.AIR) return;
+        if (blockType == BlockType.Air) return;
         AddMeshData(GetCubeConfiguration(pos), pos, blockType);
     }
 
@@ -191,10 +192,10 @@ public class Chunk
             if (corner.x < 0 || corner.z < 0 || corner.x >= ChunkWidth || corner.z >= ChunkWidth)
             {
                 // Chunk Out Of Range
-                if(world.GetBlock(ChunkPos2WorldPos(corner)) == BlockType.AIR)
+                if(world.GetBlock(ChunkPos2WorldPos(corner)) == BlockType.Air)
                     configurationIndex |= 1 << i;
             }
-            else if(blockData[corner.x, corner.y, corner.z] == BlockType.AIR)
+            else if(blockData[corner.x, corner.y, corner.z] == BlockType.Air)
                 configurationIndex |= 1 << i;
         }
         
@@ -220,11 +221,11 @@ public class Chunk
                 Vector3 vertPosition;
                 if (world.SmoothTerrain)
                 {
-                    float vert1Data = world.GetBlock(ChunkPos2WorldPos(vert1)) == BlockType.AIR
+                    float vert1Data = world.GetBlock(ChunkPos2WorldPos(vert1)) == BlockType.Air
                         ? 1
                         : 0;
 
-                    float vert2Data = world.GetBlock(ChunkPos2WorldPos(vert2)) == BlockType.AIR
+                    float vert2Data = world.GetBlock(ChunkPos2WorldPos(vert2)) == BlockType.Air
                         ? 1
                         : 0;
 
@@ -276,9 +277,8 @@ public class ChunkCoord
 
     public override bool Equals(object obj)
     {
-        if (obj is null || !(obj is ChunkCoord)) return false;
-        ChunkCoord o = (ChunkCoord) obj;
-        return o == this;
+        if (obj is null || obj is not ChunkCoord o) return false;
+        return this == o;
     }
 
     public override string ToString()
@@ -293,8 +293,5 @@ public class ChunkCoord
         return c1.x == c2.x && c1.z == c2.z && c1.world == c2.world;
     }
 
-    public static bool operator !=(ChunkCoord c1, ChunkCoord c2)
-    {
-        return !(c1 == c2);
-    }
+    public static bool operator !=(ChunkCoord c1, ChunkCoord c2) => !(c1 == c2);
 }

@@ -2,7 +2,7 @@
 {
     public static bool IsLiquid(this BlockType m)
     {
-        return m == BlockType.WATER || m == BlockType.LAVA;
+        return m == BlockType.Water || m == BlockType.Lava;
     }
 
     public static float GetStrength(this BlockType m)
@@ -40,30 +40,30 @@ public class BlockValue : System.Attribute
 [System.Serializable]
 public enum BlockType
 {
-    [BlockValue(0f, -1)]
-    AIR,
+    [BlockValue(-1, -1)]
+    Air,
     [BlockValue(1.2f, 0)]
-    GRASS,
+    Grass,
     [BlockValue(0.9f, 1)]
-    DIRT,
+    Dirt,
     [BlockValue(2f, 2)]
-    LOG,
+    Log,
     [BlockValue(0.4f, 3)]
-    LEAVES,
-    [BlockValue(0f, 4)]
-    BEDROCK,
-    [BlockValue(0f, 5)]
-    WATER,
-    [BlockValue(0f, 6)]
-    LAVA,
+    Leaves,
+    [BlockValue(-1, 4)]
+    Bedrock,
+    [BlockValue(-1, 5)]
+    Water,
+    [BlockValue(-1, 6)]
+    Lava,
     [BlockValue(11f, 7)]
-    STONE,
+    Stone,
     [BlockValue(11f, 9)]
-    COAL_ORE,
+    CoalOre,
     [BlockValue(13f, 8)]
-    IRON_ORE,
+    IronOre,
     [BlockValue(9.6f, 10)]
-    GOLD_ORE,
+    GoldOre,
 }
 
 // public enum BlockFace

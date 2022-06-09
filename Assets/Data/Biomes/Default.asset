@@ -19,8 +19,8 @@ MonoBehaviour:
   lodes:
   - nodeName: 
     block: 0
-    minHeight: 5
-    maxHeight: -1
+    minHeight: 35
+    maxHeight: 150
     scale: 0.2
     threshold: 0.4
     noiseOffset: 0
